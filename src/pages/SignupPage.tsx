@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Eye, EyeOff, Chrome, CheckCircle2 } from 'lucide-react';
 import { AuthLayout } from '@/components/AuthLayout';
 import { Button } from '@/components/Button';
 import { FormField, inputClasses } from '@/components/FormField';
 import { Spinner } from '@/components/EmptyState';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { signInWithGoogle } from '@/lib/googleAuth';
 
 export default function SignupPage() {
   const { signup } = useAuth();
@@ -19,7 +20,20 @@ export default function SignupPage() {
   const [showPw, setShowPw] = useState(false);
   const [agree, setAgree] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [formError, setFormError] = useState('');
+  const [signedUp, setSignedUp] = useState(false);
+
+  const handleGoogle = async () => {
+    setGoogleLoading(true);
+    setFormError('');
+    const { error: googleError } = await signInWithGoogle();
+    if (googleError) {
+      setGoogleLoading(false);
+      setFormError(googleError.message);
+      showError('Google sign-up failed', googleError.message);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +58,35 @@ export default function SignupPage() {
       showError('Sign up failed', res.error);
       return;
     }
-    success('Account created!', "Let's set up your interview preferences.");
-    navigate('/onboarding');
+    setSignedUp(true);
+    success('Account created!', 'Check your email to verify your account.');
   };
+
+  if (signedUp) {
+    return (
+      <AuthLayout
+        title="Check your email"
+        subtitle="We sent you a verification link."
+        footer={<>Already verified? <Link to="/login" className="font-semibold text-brand-400 hover:text-brand-300">Log in</Link></>}
+      >
+        <div className="animate-scale-in rounded-xl border border-success-400/20 bg-success-500/10 backdrop-blur-md p-6 text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-success-500/15 border border-success-400/20">
+            <CheckCircle2 className="h-6 w-6 text-success-400" />
+          </div>
+          <h3 className="mt-4 font-semibold text-white">Verify your email</h3>
+          <p className="mt-1.5 text-sm text-slate-400">
+            We sent a confirmation link to <span className="font-semibold text-white">{email}</span>. Click the link in your inbox to activate your account, then log in.
+          </p>
+          <p className="mt-2 text-xs text-slate-500">
+            Didn't get the email? Check your spam folder.
+          </p>
+          <Link to="/login" className="mt-5 inline-block">
+            <Button variant="outline" size="md">Go to login</Button>
+          </Link>
+        </div>
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout
@@ -102,6 +142,29 @@ export default function SignupPage() {
           {loading ? <Spinner /> : 'Create account'}
         </Button>
       </form>
+
+      <div className="my-5 flex items-center gap-3">
+        <div className="h-px flex-1 bg-white/10" />
+        <span className="text-xs font-medium text-slate-500">or</span>
+        <div className="h-px flex-1 bg-white/10" />
+      </div>
+
+      <button
+        onClick={handleGoogle}
+        disabled={googleLoading}
+        className="flex w-full items-center justify-center gap-2.5 rounded-xl border border-white/20 bg-white/5 backdrop-blur-md px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10 hover:border-white/30 active:translate-y-0.5 disabled:opacity-50"
+      >
+        {googleLoading ? (
+          <Spinner />
+        ) : (
+          <Chrome className="h-5 w-5 text-white" />
+        )}
+        Sign up with Google
+      </button>
+
+      <p className="mt-4 text-center text-xs text-slate-500">
+        By signing up you'll receive a verification email. You must confirm your email before logging in.
+      </p>
     </AuthLayout>
   );
 }

@@ -10,6 +10,7 @@ const LandingPage = lazy(() => import('@/pages/LandingPage'));
 const LoginPage = lazy(() => import('@/pages/LoginPage'));
 const SignupPage = lazy(() => import('@/pages/SignupPage'));
 const ForgotPasswordPage = lazy(() => import('@/pages/ForgotPasswordPage'));
+const ResetPasswordPage = lazy(() => import('@/pages/ResetPasswordPage'));
 const OnboardingPage = lazy(() => import('@/pages/OnboardingPage'));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage'));
 const NewInterviewPage = lazy(() => import('@/pages/NewInterviewPage'));
@@ -29,6 +30,7 @@ export default function App() {
               <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
               <Route path="/signup" element={<PublicOnly><SignupPage /></PublicOnly>} />
               <Route path="/forgot-password" element={<PublicOnly><ForgotPasswordPage /></PublicOnly>} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/onboarding" element={<RequireAuth><OnboardingPage /></RequireAuth>} />
               <Route element={<RequireAuth><AppLayout /></RequireAuth>}>
                 <Route path="/dashboard" element={<DashboardPage />} />

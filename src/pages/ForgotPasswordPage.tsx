@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
     }
     setLoading(true);
     const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     setLoading(false);
     if (resetError) {
@@ -48,7 +48,7 @@ export default function ForgotPasswordPage() {
             If an account exists for <span className="font-semibold text-white">{email}</span>, you'll receive a password reset link shortly.
           </p>
           <p className="mt-3 text-xs text-slate-500">
-            Check your inbox for a link to reset your password.
+            Click the link in your email to choose a new password.
           </p>
           <Link to="/login" className="mt-5 inline-block">
             <Button variant="outline" size="md">Back to login</Button>
